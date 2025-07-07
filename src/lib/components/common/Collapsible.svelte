@@ -131,31 +131,7 @@
 		}
 	}
 
-	// Function to handle data URI download
-	function downloadDataUri(dataUri: string, fileName: string) {
-		try {
-			const [header, base64Data] = dataUri.split(',');
-			const mimeType = header.match(/data:(.+);base64/)?.[1] || 'application/octet-stream';
-			
-			// Create blob from base64 data
-			const binaryString = atob(base64Data);
-			const blob = new Blob([Uint8Array.from(binaryString, (c) => c.charCodeAt(0))], {
-				type: mimeType
-			});
-			
-			// Create download link
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = fileName;
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
-		} catch (error) {
-			console.error('Error downloading data URI:', error);
-		}
-	}
+
 
 	// Function to check if a data URI is an image
 	function isImageDataUri(dataUri: string): boolean {
@@ -333,10 +309,6 @@
 										url={fileInfo.url}
 										item={fileInfo.item}
 										className="w-full max-w-md"
-										on:click={() => {
-											// Handle data URI download directly
-											downloadDataUri(file, fileInfo.name);
-										}}
 									/>
 								</div>
 							{/if}

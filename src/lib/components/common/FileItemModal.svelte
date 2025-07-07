@@ -7,6 +7,7 @@
 
 	import Modal from './Modal.svelte';
 	import XMark from '../icons/XMark.svelte';
+	import ArrowDownTray from '../icons/ArrowDownTray.svelte';
 	import Info from '../icons/Info.svelte';
 	import Switch from './Switch.svelte';
 	import Tooltip from './Tooltip.svelte';
@@ -230,7 +231,7 @@
 							href="#"
 							class="hover:underline line-clamp-1"
 							on:click|preventDefault={() => {
-								if (!isPDF && item.url) {
+								if (!isPdf && item.url) {
 									window.open(
 										item.type === 'file' ? `${item.url}/content` : `${item.url}`,
 										'_blank'
@@ -243,7 +244,22 @@
 					</div>
 				</div>
 
-				<div>
+				<div class="flex items-center gap-2">
+					{#if item.url}
+						<Tooltip content={$i18n.t('Download')}>
+							<button
+								class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+								on:click={() => {
+									window.open(
+										item.type === 'file' ? `${item.url}/content` : `${item.url}`,
+										'_blank'
+									);
+								}}
+							>
+								<ArrowDownTray className="size-5" />
+							</button>
+						</Tooltip>
+					{/if}
 					<button
 						on:click={() => {
 							show = false;
