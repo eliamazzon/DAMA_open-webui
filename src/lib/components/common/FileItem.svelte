@@ -6,6 +6,11 @@
 	import GarbageBin from '../icons/GarbageBin.svelte';
 	import Spinner from './Spinner.svelte';
 	import Tooltip from './Tooltip.svelte';
+	import Document from '../icons/Document.svelte';
+	import DocumentChartBar from '../icons/DocumentChartBar.svelte';
+	import Code from '../icons/Code.svelte';
+	import Photo from '../icons/Photo.svelte';
+	import ArchiveBox from '../icons/ArchiveBox.svelte';
 
 	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
@@ -17,7 +22,7 @@
 	export let dismissible = false;
 	export let loading = false;
 
-	export let item = null;
+	export let item: any = null;
 	export let edit = false;
 	export let small = false;
 
@@ -36,6 +41,233 @@
 			return str;
 		}
 	};
+
+	// Function to get file type info (icon and color) based on filename and MIME type
+	function getFileTypeInfo(fileName: string, mimeType?: string) {
+		const extension = fileName.split('.').pop()?.toLowerCase() || '';
+		
+		// File type definitions with icons and colors
+		const fileTypes = {
+			// Documents
+			pdf: {
+				icon: Document,
+				bgColor: 'bg-red-500',
+				textColor: 'text-red-500'
+			},
+			doc: {
+				icon: Document,
+				bgColor: 'bg-blue-500',
+				textColor: 'text-blue-500'
+			},
+			docx: {
+				icon: Document,
+				bgColor: 'bg-blue-500',
+				textColor: 'text-blue-500'
+			},
+			txt: {
+				icon: Document,
+				bgColor: 'bg-gray-500',
+				textColor: 'text-gray-500'
+			},
+			rtf: {
+				icon: Document,
+				bgColor: 'bg-gray-500',
+				textColor: 'text-gray-500'
+			},
+			
+			// Spreadsheets
+			xls: {
+				icon: DocumentChartBar,
+				bgColor: 'bg-green-500',
+				textColor: 'text-green-500'
+			},
+			xlsx: {
+				icon: DocumentChartBar,
+				bgColor: 'bg-green-500',
+				textColor: 'text-green-500'
+			},
+			csv: {
+				icon: DocumentChartBar,
+				bgColor: 'bg-green-500',
+				textColor: 'text-green-500'
+			},
+			
+			// Presentations
+			ppt: {
+				icon: Document,
+				bgColor: 'bg-orange-500',
+				textColor: 'text-orange-500'
+			},
+			pptx: {
+				icon: Document,
+				bgColor: 'bg-orange-500',
+				textColor: 'text-orange-500'
+			},
+			
+			// Code files
+			js: {
+				icon: Code,
+				bgColor: 'bg-yellow-500',
+				textColor: 'text-yellow-500'
+			},
+			ts: {
+				icon: Code,
+				bgColor: 'bg-blue-600',
+				textColor: 'text-blue-600'
+			},
+			py: {
+				icon: Code,
+				bgColor: 'bg-blue-500',
+				textColor: 'text-blue-500'
+			},
+			java: {
+				icon: Code,
+				bgColor: 'bg-red-600',
+				textColor: 'text-red-600'
+			},
+			cpp: {
+				icon: Code,
+				bgColor: 'bg-blue-700',
+				textColor: 'text-blue-700'
+			},
+			c: {
+				icon: Code,
+				bgColor: 'bg-blue-700',
+				textColor: 'text-blue-700'
+			},
+			html: {
+				icon: Code,
+				bgColor: 'bg-orange-500',
+				textColor: 'text-orange-500'
+			},
+			css: {
+				icon: Code,
+				bgColor: 'bg-blue-500',
+				textColor: 'text-blue-500'
+			},
+			json: {
+				icon: Code,
+				bgColor: 'bg-gray-600',
+				textColor: 'text-gray-600'
+			},
+			xml: {
+				icon: Code,
+				bgColor: 'bg-orange-600',
+				textColor: 'text-orange-600'
+			},
+			
+			// Images
+			jpg: {
+				icon: Photo,
+				bgColor: 'bg-purple-500',
+				textColor: 'text-purple-500'
+			},
+			jpeg: {
+				icon: Photo,
+				bgColor: 'bg-purple-500',
+				textColor: 'text-purple-500'
+			},
+			png: {
+				icon: Photo,
+				bgColor: 'bg-purple-500',
+				textColor: 'text-purple-500'
+			},
+			gif: {
+				icon: Photo,
+				bgColor: 'bg-purple-500',
+				textColor: 'text-purple-500'
+			},
+			svg: {
+				icon: Photo,
+				bgColor: 'bg-purple-500',
+				textColor: 'text-purple-500'
+			},
+			webp: {
+				icon: Photo,
+				bgColor: 'bg-purple-500',
+				textColor: 'text-purple-500'
+			},
+			
+			// Archives
+			zip: {
+				icon: ArchiveBox,
+				bgColor: 'bg-yellow-600',
+				textColor: 'text-yellow-600'
+			},
+			rar: {
+				icon: ArchiveBox,
+				bgColor: 'bg-red-500',
+				textColor: 'text-red-500'
+			},
+			tar: {
+				icon: ArchiveBox,
+				bgColor: 'bg-blue-600',
+				textColor: 'text-blue-600'
+			},
+			gz: {
+				icon: ArchiveBox,
+				bgColor: 'bg-blue-600',
+				textColor: 'text-blue-600'
+			},
+			'7z': {
+				icon: ArchiveBox,
+				bgColor: 'bg-green-600',
+				textColor: 'text-green-600'
+			}
+		};
+
+		// Check MIME type first, then fall back to extension
+		if (mimeType) {
+			const mimeToExtension = {
+				'application/pdf': 'pdf',
+				'application/msword': 'doc',
+				'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+				'text/plain': 'txt',
+				'application/rtf': 'rtf',
+				'application/vnd.ms-excel': 'xls',
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+				'text/csv': 'csv',
+				'application/vnd.ms-powerpoint': 'ppt',
+				'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+				'text/javascript': 'js',
+				'application/typescript': 'ts',
+				'text/x-python': 'py',
+				'text/x-java-source': 'java',
+				'text/x-c++src': 'cpp',
+				'text/x-csrc': 'c',
+				'text/html': 'html',
+				'text/css': 'css',
+				'application/json': 'json',
+				'application/xml': 'xml',
+				'image/jpeg': 'jpg',
+				'image/png': 'png',
+				'image/gif': 'gif',
+				'image/svg+xml': 'svg',
+				'image/webp': 'webp',
+				'application/zip': 'zip',
+				'application/x-rar-compressed': 'rar',
+				'application/x-tar': 'tar',
+				'application/gzip': 'gz',
+				'application/x-7z-compressed': '7z'
+			};
+			
+			const mimeExtension = mimeToExtension[mimeType];
+			if (mimeExtension && fileTypes[mimeExtension]) {
+				return fileTypes[mimeExtension];
+			}
+		}
+
+		// Fall back to extension-based detection
+		return fileTypes[extension] || {
+			icon: Document,
+			bgColor: 'bg-gray-500',
+			textColor: 'text-gray-500'
+		};
+	}
+
+	// Get file type info for current file
+	$: fileTypeInfo = getFileTypeInfo(name, item?.file?.data?.content ? 
+		item.file.data.content.match(/data:(.+);base64/)?.[1] : null);
 </script>
 
 {#if item}
@@ -64,23 +296,9 @@
 	}}
 >
 	{#if !small}
-		<div class="p-3 bg-black/20 dark:bg-white/10 text-white rounded-xl">
+		<div class="p-3 {fileTypeInfo.bgColor} text-white rounded-xl">
 			{#if !loading}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					class=" size-5"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625ZM7.5 15a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 7.5 15Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H8.25Z"
-						clip-rule="evenodd"
-					/>
-					<path
-						d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z"
-					/>
-				</svg>
+				<svelte:component this={fileTypeInfo.icon} className="size-5" />
 			{:else}
 				<Spinner />
 			{/if}

@@ -38,6 +38,7 @@
 	import CodeBlock from '../chat/Messages/CodeBlock.svelte';
 	import Markdown from '../chat/Messages/Markdown.svelte';
 	import Image from './Image.svelte';
+	import FileItem from './FileItem.svelte';
 
 	export let open = false;
 
@@ -83,6 +84,82 @@
 			// Not valid JSON, return as-is
 			return str;
 		}
+	}
+
+	// Utility function to convert data URI to file info
+	function dataUriToFileInfo(dataUri: string, index: number) {
+		try {
+			const [header, base64Data] = dataUri.split(',');
+			const mimeType = header.match(/data:(.+);base64/)?.[1] || 'application/octet-stream';
+			
+			// Decode base64 to get file size
+			const binaryString = atob(base64Data);
+			const size = binaryString.length;
+			
+			// Generate filename based on MIME type
+			const extension = mimeType.split('/')[1] || 'bin';
+			const fileName = `tool-result-${index + 1}.${extension}`;
+			
+			// Create a blob URL for download
+			const blob = new Blob([Uint8Array.from(binaryString, (c) => c.charCodeAt(0))], {
+				type: mimeType
+			});
+			const blobUrl = URL.createObjectURL(blob);
+			
+			return {
+				name: fileName,
+				type: 'file',
+				size: size,
+				url: blobUrl,
+				mimeType: mimeType,
+				item: {
+					file: {
+						data: {
+							content: dataUri
+						}
+					},
+					name: fileName,
+					size: size,
+					url: blobUrl,
+					blob: blob,
+					mimeType: mimeType
+				}
+			};
+		} catch (error) {
+			console.error('Error converting data URI to file info:', error);
+			return null;
+		}
+	}
+
+	// Function to handle data URI download
+	function downloadDataUri(dataUri: string, fileName: string) {
+		try {
+			const [header, base64Data] = dataUri.split(',');
+			const mimeType = header.match(/data:(.+);base64/)?.[1] || 'application/octet-stream';
+			
+			// Create blob from base64 data
+			const binaryString = atob(base64Data);
+			const blob = new Blob([Uint8Array.from(binaryString, (c) => c.charCodeAt(0))], {
+				type: mimeType
+			});
+			
+			// Create download link
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error('Error downloading data URI:', error);
+		}
+	}
+
+	// Function to check if a data URI is an image
+	function isImageDataUri(dataUri: string): boolean {
+		return dataUri.startsWith('data:image/');
 	}
 </script>
 
@@ -238,12 +315,31 @@
 			{#if attributes?.done === 'true'}
 				{#if typeof files === 'object'}
 					{#each files ?? [] as file, idx}
-						{#if file.startsWith('data:image/')}
+						{#if isImageDataUri(file)}
 							<Image
 								id={`${collapsibleId}-tool-calls-${attributes?.id}-result-${idx}`}
 								src={file}
 								alt="Image"
 							/>
+						{:else if file.startsWith('data:')}
+							{@const fileInfo = dataUriToFileInfo(file, idx)}
+							{#if fileInfo}
+								<div class="mt-2">
+									<FileItem
+										id={`${collapsibleId}-tool-calls-${attributes?.id}-file-${idx}`}
+										name={fileInfo.name}
+										type={fileInfo.type}
+										size={fileInfo.size}
+										url={fileInfo.url}
+										item={fileInfo.item}
+										className="w-full max-w-md"
+										on:click={() => {
+											// Handle data URI download directly
+											downloadDataUri(file, fileInfo.name);
+										}}
+									/>
+								</div>
+							{/if}
 						{/if}
 					{/each}
 				{/if}
