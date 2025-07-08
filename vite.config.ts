@@ -30,6 +30,18 @@ export default defineConfig({
 			]
 		})
 	],
+	server: {
+		host: true,
+		allowedHosts: [
+			'localhost',
+			'.ngrok-free.app',
+			'.ngrok.io',
+			'.ngrok.app',
+			'.ngrok.dev',
+			'.loca.lt',
+			'.trycloudflare.com'
+		]
+	},
 	define: {
 		APP_VERSION: JSON.stringify(process.env.npm_package_version),
 		APP_BUILD_HASH: JSON.stringify(process.env.APP_BUILD_HASH || 'dev-build')
